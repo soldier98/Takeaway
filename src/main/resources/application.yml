@@ -1,13 +1,14 @@
 server:
   port: 8080
-spring:
-  web:
-    resources:
-      static-locations: classpath:/static/ #配置静态资源路径，默认访问static下index.html
-  main:
-    banner-mode: off #关闭springBoot启动图案
+#spring:
+#  web:
+#    resources:
+#      static-locations: classpath:/static/ #配置静态资源路径，默认访问static下index.html
+#  main:
 ---
 spring:
+  main:
+      banner-mode: off #关闭springBoot启动图案
   datasource:
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://localhost:13306/takeaway?useSSL=false
@@ -22,3 +23,4 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: ASSIGN_ID
+    banner: off

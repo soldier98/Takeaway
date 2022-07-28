@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * <p>
@@ -16,6 +17,7 @@ import lombok.EqualsAndHashCode;
  * @author soldier
  * @since 2022-07-18
  */
+@ToString
 @EqualsAndHashCode(callSuper = false)
 public class Employee implements Serializable {
 
