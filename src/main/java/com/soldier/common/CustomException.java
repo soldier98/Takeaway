@@ -11,3 +11,4 @@ public CustomException(String mesg){
     super();
 }
 }
+//测试Git pull是否需要权限
