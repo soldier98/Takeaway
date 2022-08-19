@@ -24,3 +24,6 @@ mybatis-plus:
     db-config:
       id-type: ASSIGN_ID
     banner: off
+---
+takeaway:
+  path: F:\TakeawayPicture\

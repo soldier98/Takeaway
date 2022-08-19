@@ -18,6 +18,13 @@ public class MyException {
     @ExceptionHandler(SQLException.class)
     public Result<String> exceptionHandler(Exception ex){
         log.info("异常信息"+ex.getMessage());
-        return new Result<String>(0,"**异常",null);
+        return new Result<String>(0,"SQLException异常",null);
     }
+
+    @ExceptionHandler(CustomException.class)
+    public Result<String> doHandler(CustomException e){
+        log.error("消费者异常"+e.getMessage());
+        return new Result<String>(0,e.getMessage(),null);
+    }
+
 }

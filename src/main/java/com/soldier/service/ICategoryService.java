@@ -11,6 +11,15 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author soldier
  * @since 2022-07-18
  */
-public interface ICategoryService extends IService<Category> {
 
+public interface ICategoryService extends IService<Category> {
+    /**
+     *
+     * @Author soldier
+     * @Description 扩展删除方法，判定是否有关联项
+     * @Date  2022/8/1
+     * @param id
+     * @return boolean
+     **/
+    public boolean remove(Long id);
 }

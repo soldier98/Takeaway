@@ -4,6 +4,7 @@ import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.soldier.common.BaseCotext;
 import com.soldier.common.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,17 +26,24 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginCheckInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-    //如果会话中无用户信息，拦截
-        if (request.getSession().getAttribute("employee") == null) {
-            log.info("URL => {},session为空，不执行controller -- :{}",request.getRequestURL(),handler.getClass().getName());
-            //配合前端代码，返回code为0，和msg为NOLOGIN 则跳转登陆界面
-//            response.getWriter().write(JSONUtils.toJSONString(new Result<String>(0,"NOTLOGIN",null)));
-            response.getWriter().write(JSON.toJSONString(new Result<String>(0,"NOTLOGIN",null)));
-            return false;
-        } else {
-            log.info("session中employee是{}，执行controller -- :{}",request.getSession().getAttribute("employee"),handler.getClass().getName());
-            return true;    //如果会话中有用户信息，则已经登录，返回true，不做拦截
+        log.info("LoginCheckInterceptor当前线程id: {}", Thread.currentThread().getId());
+ //如果会话中有用户信息，则放行
+        if (request.getSession().getAttribute("employee") != null) {
+//给线程放id
+            BaseCotext.setID((Long) request.getSession().getAttribute("employee"));
+            //放行
+            return true;
         }
+        if (request.getSession().getAttribute("userId") != null) {
+            BaseCotext.setID((Long) request.getSession().getAttribute("userId"));
+            return true;
+        }
+
+        log.info("URL => {},session为空，不执行controller -- :{}", request.getRequestURL(), handler.getClass().getName());
+        //配合前端代码，返回code为0，和msg为 NOLOGIN 则跳转登陆界面
+//            response.getWriter().write(JSONUtils.toJSONString(new Result<String>(0,"NOTLOGIN",null)));
+        response.getWriter().write(JSON.toJSONString(new Result<String>(0, "NOTLOGIN", null)));
+        return false;
     }
 
     @Override

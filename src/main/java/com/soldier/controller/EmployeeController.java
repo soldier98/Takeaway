@@ -176,7 +176,7 @@ public class EmployeeController {
      * @Date 2022/7/28
      **/
     @GetMapping("/{id}")
-    public Result<Employee> selectDetail(@PathVariable Integer id) {
+    public Result<Employee> selectDetail(@PathVariable Long id) {
         Employee byId = employeeService.getById(id);
         if (byId != null) {
             return new Result<Employee>(1, "", byId);
@@ -192,10 +192,11 @@ public class EmployeeController {
      **/
     @PutMapping
     public Result<String> edit(HttpServletRequest request,@RequestBody Employee employee) {
+        log.info("edit当前线程id{}: ",Thread.currentThread().getId());
         Long editID = (Long) request.getSession().getAttribute("employee");
 
-        employee.setUpdateUser(editID);
-        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateUser(editID);
+//        employee.setUpdateTime(LocalDateTime.now());
 
         boolean b = employeeService.updateById(employee);
         if (b) {

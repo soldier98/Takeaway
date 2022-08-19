@@ -30,7 +30,7 @@ import java.util.List;
 @Slf4j
 @EnableWebMvc
 public class InterceptorConfig implements WebMvcConfigurer {
-    @Autowired
+   @Autowired
     private LoginCheckInterceptor interceptor;
 
     //  用 WebMvcConfigurer 配置类后，springboot的默认配置就会失效，需要重新配置静态资源路径等.......
@@ -43,7 +43,9 @@ public class InterceptorConfig implements WebMvcConfigurer {
     private final List<String> EXCLUDE_URLS = Arrays.asList("/employee/login",
             "/employee/logout",
             "/backend/**",
-            "/front/**");
+            "/front/**",
+            "/user/sendMsg",
+            "/user/login");
 
     //
     @Override
@@ -51,6 +53,8 @@ public class InterceptorConfig implements WebMvcConfigurer {
         registry.addInterceptor(interceptor).addPathPatterns("/**")
                 .excludePathPatterns(EXCLUDE_URLS);
     }
+
+
 /**
  *
  * @Author soldier
