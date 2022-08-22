@@ -30,7 +30,7 @@ public class DishController {
 
     //查询
     @GetMapping("/page")
-    public Result<Page> select(int page, int pageSize) {
+    public Result<Page> page(int page, int pageSize) {
         Page<Dish> dishPage = new Page<>(page, pageSize);
 
         //按创建时间
@@ -79,7 +79,7 @@ public class DishController {
      * @param categoryId
      * @return com.soldier.common.Result<java.util.List>
      * @Author soldier
-     * @Description //通过菜品分类id查询对应的菜品们
+     * @Description //移动端通过catageryId查询
      * @Date 2022/8/4
      **/
     @GetMapping("/list")

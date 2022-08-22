@@ -1,0 +1,34 @@
+#=====================生产环境==============
+spring:
+  config:
+    activate:
+      on-profile: prod
+server:
+  port: 8080
+#spring:
+#  web:
+#    resources:
+#      static-locations: classpath:/static/ #配置静态资源路径，默认访问static下index.html
+#  main:
+---
+spring:
+  main:
+    banner-mode: off #关闭springBoot启动图案
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:13306/takeaway?useSSL=false
+    username: root
+    password: abc123
+    type: com.alibaba.druid.pool.DruidDataSource
+mybatis-plus:
+  configuration:
+    #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID
+    banner: off
+---
+takeaway:
+  path: /usr/local/TakeawayPicture
