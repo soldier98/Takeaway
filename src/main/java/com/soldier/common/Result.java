@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * 【统一的返回结果】
  *
@@ -15,7 +17,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Result<T> {
+public class Result<T>  implements Serializable {//redis 缓存数据需要序列化，故实现该接口
+
     private Integer code;  //编码1成功，其他数字则为失败
     private String msg;
     private T data;

@@ -20,6 +20,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SetmealDto extends Setmeal {
+    //用于保存套餐里的菜品详情
     private List<SetmealDish> setmealDishes = new ArrayList<>();
 
     //用于套餐界面的分类Name

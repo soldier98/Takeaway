@@ -15,6 +15,10 @@ import com.soldier.service.ISetmealDishService;
 import com.soldier.service.ISetmealService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -46,6 +50,9 @@ public class SetmealController {
     @Autowired
     private ICategoryService categoryService;
 
+
+    @Autowired
+    private CacheManager cacheManager;
 
     @GetMapping("/page")
     public Result<Page<SetmealDto>> page(int page, int pageSize, String name) {
@@ -83,6 +90,7 @@ public class SetmealController {
      * @Description //保存套餐，同时保存对应的Dish在Setmeal_dish表中
      * @Date 2022/8/4
      **/
+    @CacheEvict(value = "setmealsCache", allEntries = true)
     @PostMapping
     public Result<String> saveWithDish(@RequestBody SetmealDto setmealDto) {
         //先把套餐基本信息保存在Seatmeal表中
@@ -110,6 +118,7 @@ public class SetmealController {
      * @Description //修改页面查询到详情
      * @Date 2022/8/5
      **/
+    @Cacheable(value = "setmealsCache", key = "#id")
     @GetMapping("/{id}")
     public Result<SetmealDto> selectById(@PathVariable("id") Long id) {
         Setmeal byId = setmealService.getById(id);
@@ -136,6 +145,7 @@ public class SetmealController {
      * 推荐吧业务写到service层
      * @Date 2022/8/6
      **/
+    @CacheEvict(value = "setmealsCache", allEntries = true)//allEntries = true清除缓存是清除当前value值空间下的所有缓存数据
     @Transactional
     @DeleteMapping
     public Result<String> delet(Long id) {
@@ -155,14 +165,55 @@ public class SetmealController {
         } else return new Result<>(0, "删除失败", null);
     }
 
-    @GetMapping("/list")
-    public Result<List> list(Setmeal setmeal) {
-        LambdaQueryWrapper<Setmeal> setmealLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        setmealLambdaQueryWrapper.eq(setmeal.getCategoryId() != null,Setmeal::getCategoryId,setmeal.getCategoryId())
-                                 .eq(setmeal.getStatus()!=null,Setmeal::getStatus,1);
-        List<Setmeal> setmealList = setmealService.list(setmealLambdaQueryWrapper);
-        return new Result<>(1,"套餐list",setmealList);
+    /**
+     * @param setmeal
+     * @return com.soldier.common.Result<java.util.List>
+     * @Author soldier
+     * @Description //TODO 根据条件查询
+     * @Date 2022/8/24
+     **/
 
+//@CachePut 把方法的返回值缓存在 redis 中，value是缓存名字，可对应多个key
+    @CachePut(value = "setmealsCache", key = "#setmeal.categoryId+'_'+#setmeal.status")
+    @GetMapping("/list")
+    public Result<List<Setmeal>> list(Setmeal setmeal) {
+        LambdaQueryWrapper<Setmeal> setmealLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        setmealLambdaQueryWrapper.eq(setmeal.getCategoryId() != null, Setmeal::getCategoryId, setmeal.getCategoryId())
+                .eq(setmeal.getStatus() != null, Setmeal::getStatus, 1);
+        List<Setmeal> setmealList = setmealService.list(setmealLambdaQueryWrapper);
+        return new Result<List<Setmeal>>(1, "套餐list", setmealList);
+
+    }
+
+    /**
+     * @param
+     * @return com.soldier.common.Result<java.lang.String>
+     * @Author soldier
+     * @Description //TODO 修改套餐界面
+     * @Date 2022/8/25
+     **/
+    @PutMapping
+    @Transactional
+    public Result<String> editSetmeal(@RequestBody SetmealDto setmealDto) {
+        //先将setmeal表中数据更新
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDto, setmeal);
+        setmealService.updateById(setmeal);
+        //更新 setmealDish 表
+          //by setmealId删除之前的dish
+        LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        setmealDishLambdaQueryWrapper.eq(SetmealDish::getSetmealId,setmeal.getId());
+        isetmealdishService.remove(setmealDishLambdaQueryWrapper);
+            //保存菜品dishes
+        List<SetmealDish> setmealDishes = setmealDto.getSetmealDishes();
+        setmealDishes.stream().map(item ->
+                {
+                    item.setSetmealId(setmealDto.getId());
+                    return item;
+                }
+                ).collect(Collectors.toList());
+        isetmealdishService.saveBatch(setmealDishes);
+        return new Result<>(1,"xiugaichenggong",null);
     }
 }
 
